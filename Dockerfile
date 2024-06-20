@@ -26,6 +26,7 @@ STOPSIGNAL SIGQUIT
    
 HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD kong health
    
+COPY nginx-kong.conf /usr/local/kong/
+
 CMD ["kong", "docker-start"] 
 
-COPY nginx-kong.conf /usr/local/kong/

@@ -33,6 +33,9 @@ jobs:
       - name: Save Docker image as tar file
         run: docker save -o kong-34.tar kong:kong-34
 
+      - name: Test Docker image
+        run: docker run --rm kong:kong-34 kong version
+
       - name: Check artifact
         run: |
           echo "🔎 List the artifact file."
