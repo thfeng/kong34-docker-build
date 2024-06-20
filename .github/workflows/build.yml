@@ -1,0 +1,73 @@
+name: KONG 3.4.3.9 Image Build
+run-name: Build KONG 3.4.3.9 Docker Image - ${{ github.actor }} 🚀
+on: [push]
+    
+jobs:
+  Build-Image:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+
+      - name: List files in the repository
+        run: |
+          ls -lh ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v1
+
+      - name: Docker build
+        run: |
+          docker build --platform linux/amd64 --no-cache -t kong:kong-34 .
+      
+      - name: Save Docker image as tar file
+        run: docker save -o kong-34.tar kong:kong-34
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: kong-image
+          path: ${{ github.workspace }}/kong-34.tar
+  Publish:
+    needs: Build-Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: kong-image
+
+      - name: Check artifact
+        run: |
+          echo "🔎 List the artifact file."
+          ls -lh ${{ github.workspace }}
+      - run: echo "💡 A new release will be published."
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}_${{ github.RUN_NUMBER	}}
+          release_name: ${{ github.ref_name }}_${{ github.RUN_NUMBER	}}
+          draft: false
+          prerelease: false
+
+      - name: Upload to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/kong-34.tar
+          asset_name: kong-34.tar
+          asset_content_type: application/x-tar
+      
