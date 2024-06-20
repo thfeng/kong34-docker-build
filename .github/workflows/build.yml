@@ -30,20 +30,6 @@ jobs:
       - name: Save Docker image as tar file
         run: docker save -o kong-34.tar kong:kong-34
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: kong-image
-          path: ${{ github.workspace }}/kong-34.tar
-  Publish:
-    needs: Build-Image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v2.1.1
-        with:
-          name: kong-image
-
       - name: Check artifact
         run: |
           echo "🔎 List the artifact file."
