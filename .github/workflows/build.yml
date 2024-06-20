@@ -1,6 +1,9 @@
 name: KONG 3.4.3.9 Image Build
 run-name: Build KONG 3.4.3.9 Docker Image - ${{ github.actor }} 🚀
-on: [push]
+on:
+  push:
+    branches:
+      - main
     
 jobs:
   Build-Image:
